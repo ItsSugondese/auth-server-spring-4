@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: AuthServer
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_server
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 300
+      connection-timeout: 600000
+      idle-timeout: 60000
+      max-lifetime: 1800
+      leak-detection-threshold: 600000
+      auto-commit: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: update  # Use 'update' for production, 'create-drop' for dev/testing
