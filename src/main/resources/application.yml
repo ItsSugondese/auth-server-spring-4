@@ -35,3 +35,6 @@ mybatis:
   type-aliases-package: com.lazy.authserver.pojo.*;com.lazy.authserver.dto.* # Tells mybatis to look for our POJO class in the right package
   configuration:
     map-underscore-to-camel-case: true #converts underscore of db into camelcase
+
+
+FRONTEND_URL: http://localhost:5173

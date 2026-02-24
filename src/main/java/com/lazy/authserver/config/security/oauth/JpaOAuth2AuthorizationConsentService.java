@@ -1,4 +1,4 @@
-package com.lazy.authserver.config.oauth;
+package com.lazy.authserver.config.security.oauth;
 
 import com.lazy.authserver.entity.oauth.AuthorizationConsent;
 import com.lazy.authserver.repository.oauth.AuthorizationConsentRepository;

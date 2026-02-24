@@ -1,4 +1,4 @@
-package com.lazy.authserver.config.oauth;
+package com.lazy.authserver.config.security.oauth;
 
 import com.lazy.authserver.entity.user.User;
 import com.lazy.authserver.exception.AppException;

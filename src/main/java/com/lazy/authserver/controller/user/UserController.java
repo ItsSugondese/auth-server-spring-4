@@ -6,7 +6,6 @@ import com.lazy.authserver.enums.Message;
 import com.lazy.authserver.generic.controller.BaseController;
 import com.lazy.authserver.pojo.GlobalApiResponse;
 import com.lazy.authserver.pojo.user.UserRequestPojo;
-import com.lazy.authserver.pojo.user.passwordUpdate.UpdatePasswordRequestPojo;
 import com.lazy.authserver.pojo.user.resetPassword.ResetPasswordDetailRequestPojo;
 import com.lazy.authserver.service.user.UserService;
 import com.lazy.authserver.service.user.UserServiceHelper;
@@ -35,10 +34,16 @@ public class UserController extends BaseController {
         this.moduleName = "User";
     }
 
+    @GetMapping
+    @Operation(summary = "Use this api save and update internal and external user by admin. do not send email address for update")
+    public ResponseEntity<GlobalApiResponse> test() throws Exception {
+        return ResponseEntity.ok(successResponse(customMessageSource.get(MessageConstants.CRUD_SAVE, moduleName),
+                "okay"));
+    }
     @PostMapping
     @Operation(summary = "Use this api save and update internal and external user by admin. do not send email address for update")
     public ResponseEntity<GlobalApiResponse> saveUser(@RequestBody UserRequestPojo userRequestPojo) throws Exception {
-        return ResponseEntity.ok(successResponse(customMessageSource.get("crud.create", moduleName),
+        return ResponseEntity.ok(successResponse(customMessageSource.get(MessageConstants.CRUD_SAVE, moduleName),
                 userService.saveUser(userRequestPojo)));
     }
 
@@ -46,7 +51,7 @@ public class UserController extends BaseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<GlobalApiResponse> deleteUserById(@PathVariable Integer id) {
         userService.deleteUserById(id);
-        return ResponseEntity.ok(successResponse(customMessageSource.get("crud.inactive", moduleName), null));
+        return ResponseEntity.ok(successResponse(customMessageSource.get(MessageConstants.DELETE, moduleName), null));
     }
 
     @PostMapping("/forgot-password")

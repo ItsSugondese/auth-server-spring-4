@@ -1,4 +1,4 @@
-package com.lazy.authserver.config.oauth;
+package com.lazy.authserver.config.security.oauth;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
