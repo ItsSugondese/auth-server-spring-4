@@ -8,7 +8,7 @@ import com.lazy.authserver.pojo.user.resetPassword.ResetPasswordDetailRequestPoj
 public interface ResetPasswordService {
     ResetPasswordDetailRequestPojo resetPasswordEmailVerify(ResetPasswordDetailRequestPojo requestPojo);
 
-    String generateAndSaveToken(PasswordSetType passwordSetType, Integer userId);
+    String generateAndSaveToken(PasswordSetType passwordSetType, Long userId);
 
     ResetPasswordDetailRequestPojo validatePasswordResetToken(ResetPasswordDetailRequestPojo requestPojo);
 

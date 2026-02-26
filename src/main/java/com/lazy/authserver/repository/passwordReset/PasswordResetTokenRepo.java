@@ -14,7 +14,7 @@ public interface PasswordResetTokenRepo extends JpaRepository<PasswordResetToken
     @Query(value = "select *,to_char(expiry_date,'yyyy-MM-dd hh:mm:ss') as expiry_date from password_reset_token where user_id=?1 and token=?2", nativeQuery = true)
     Optional<PasswordResetToken> findByEmailAndToken(Long id, String resetToken);
 
-    @Query(value = "select *,to_char(expiry_date,'yyyy-MM-dd hh:mm:ss') as expiry_date from password_reset_token prt" +
+    @Query(value = "select * from password_reset_token prt" +
             " where prt.token=?1 and prt.is_active=true and prt.status=1 and prt.expiry_date>=current_timestamp",
             nativeQuery = true)
     Optional<PasswordResetToken> findByToken(String resetToken);

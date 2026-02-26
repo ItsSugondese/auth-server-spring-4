@@ -36,5 +36,10 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true #converts underscore of db into camelcase
 
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+
 
 FRONTEND_URL: http://localhost:5173

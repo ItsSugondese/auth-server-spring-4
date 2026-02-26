@@ -31,24 +31,30 @@ public class ClientSeeder implements CommandLineRunner {
 //                .scope("client_registration")
 //                .build();
 
-        RegisteredClient registeredClient =
-                RegisteredClient.withId(UUID.randomUUID().toString())
-                        .clientId("react-client")
-                        .clientAuthenticationMethod(ClientAuthenticationMethod.NONE) // public client
-                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                        .redirectUri("http://localhost:3000/callback")
-                        .scope(OidcScopes.OPENID)
-                        .scope("profile")
-                        .clientSettings(
-                                ClientSettings.builder()
-                                        .requireProofKey(true)  // ✅ THIS is correct in older versions
-                                        .requireAuthorizationConsent(false)
-                                        .build()
-                        )  // 🔥 THIS enables PKCE requirement
-                        .build();
+        RegisteredClient registeredClient =  RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("react-client")
+                .clientSecret(passwordEncoder.encode("secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+                // If you want no secret, keep NONE; otherwise use CLIENT_SECRET_BASIC
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+
+                // 1. Set ONLY the password grant type
+                .authorizationGrantType(new AuthorizationGrantType("password"))
+
+                // 2. Refresh tokens are usually helpful with password grants
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+
+                .scope(OidcScopes.OPENID)
+                .scope("profile")
+                .clientSettings(ClientSettings.builder()
+                        .requireProofKey(true) // enforces PKCE
+                        .build())
+                .build();
 
         if(registeredClientRepository.findByClientId(registeredClient.getClientId()) == null) {
             registeredClientRepository.save(registeredClient);
         }
+
+
     }
 }

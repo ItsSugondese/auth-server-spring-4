@@ -2,15 +2,15 @@ package com.lazy.authserver.controller.user;
 
 import com.lazy.authserver.constant.MessageConstants;
 import com.lazy.authserver.constant.ModuleNameConstants;
-import com.lazy.authserver.enums.Message;
+import com.lazy.authserver.dto.user.UserEmailDetailsRequest;
 import com.lazy.authserver.generic.controller.BaseController;
 import com.lazy.authserver.pojo.GlobalApiResponse;
-import com.lazy.authserver.pojo.user.UserRequestPojo;
 import com.lazy.authserver.pojo.user.resetPassword.ResetPasswordDetailRequestPojo;
 import com.lazy.authserver.service.user.UserService;
 import com.lazy.authserver.service.user.UserServiceHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
-@Tag(name = ModuleNameConstants.APP_USER)
+@Tag(name = ModuleNameConstants.USER)
 public class UserController extends BaseController {
 
     private final UserService userService;
@@ -34,17 +34,13 @@ public class UserController extends BaseController {
         this.moduleName = "User";
     }
 
-    @GetMapping
-    @Operation(summary = "Use this api save and update internal and external user by admin. do not send email address for update")
-    public ResponseEntity<GlobalApiResponse> test() throws Exception {
-        return ResponseEntity.ok(successResponse(customMessageSource.get(MessageConstants.CRUD_SAVE, moduleName),
-                "okay"));
-    }
+
     @PostMapping
     @Operation(summary = "Use this api save and update internal and external user by admin. do not send email address for update")
-    public ResponseEntity<GlobalApiResponse> saveUser(@RequestBody UserRequestPojo userRequestPojo) throws Exception {
+    public ResponseEntity<GlobalApiResponse> saveUser(@Valid @RequestBody UserEmailDetailsRequest userRequestPojo) throws Exception {
+        userService.saveUser(userRequestPojo);
         return ResponseEntity.ok(successResponse(customMessageSource.get(MessageConstants.CRUD_SAVE, moduleName),
-                userService.saveUser(userRequestPojo)));
+                true));
     }
 
 

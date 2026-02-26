@@ -15,6 +15,7 @@ public class ResetPasswordDetailRequestPojo {
     private String resetToken;
     private String baseUrl;
     private String fullName;
+    private String clientId;
     @JsonIgnore
     private Long tokenId;
     private PasswordSetType passwordSetType = PasswordSetType.RESET;

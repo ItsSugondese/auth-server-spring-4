@@ -1,10 +1,14 @@
 package com.lazy.authserver.mapper.user;
 
+import com.lazy.authserver.dto.user.UserDetailsResponse;
 import org.apache.ibatis.annotations.Mapper;
 
 
 @Mapper
 public interface UserDetailMapper {
+
+
+
 
 //    @Select("select u.id as userId,u.email_address as userEmail from users u where u.is_active=true order by u.id asc")
 //    List<UserBasicDetailResponsePojo> getAllUserIdName();

@@ -1,11 +1,15 @@
 package com.lazy.authserver.config.security.oauth;
 
-import com.lazy.authserver.entity.user.User;
+import com.lazy.authserver.entity.user.Users;
+import com.lazy.authserver.entity.user.UsersClientMapping;
 import com.lazy.authserver.exception.AppException;
 import com.lazy.authserver.repository.user.UserRepo;
+import com.lazy.authserver.repository.user.UsersClientMappingRepo;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -18,18 +22,29 @@ import java.util.HashSet;
 @Service
 public class JpaUserDetailsManager implements UserDetailsManager {
 
-	private final UserRepo userRepo;
-	
+	private final UsersClientMappingRepo usersClientMappingRepo;
+	private final HttpServletRequest request;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new AppException(username));
-		if (!user.getUsername().equals(username)) {
-			throw new UsernameNotFoundException("Access Denied");
-		}
-		Collection<GrantedAuthority> authoriies = new HashSet<>();
-		user.getAuthorities().forEach(auth -> authoriies.add(new SimpleGrantedAuthority(auth.getAuthority())));
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getEnabled(), user.getAccountNonExpired(),
-				user.getCredentialsNonExpired(), user.getAccountNonLocked(), authoriies);
+		String clientId = request.getParameter("client_id");
+
+		UsersClientMapping mapping =
+				usersClientMappingRepo.findByClientIdAndUsersUsername(clientId, username)
+						.orElseThrow(() ->
+								new UsernameNotFoundException("User not found"));
+
+		Collection<GrantedAuthority> authorities = new HashSet<>();
+		mapping.getAuthorities().forEach(auth -> authorities.add(new SimpleGrantedAuthority(auth.getAuthority())));
+		return new User(
+				username,
+				mapping.getPassword(),
+				mapping.isActive(),
+				mapping.isAccountNonExpired(),
+				mapping.isCredentialsNonExpired(),
+				mapping.isAccountNonLocked(),
+				authorities
+		);
 	}
 
 	@Override
@@ -50,8 +65,14 @@ public class JpaUserDetailsManager implements UserDetailsManager {
 
 	@Override
 	public boolean userExists(String username) {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new AppException("User not found"));
-		if (user.getUsername().equals(username)) {
+		String clientId = request.getParameter("client_id");
+
+		UsersClientMapping mapping =
+				usersClientMappingRepo.findByClientIdAndUsersUsername(clientId, username)
+						.orElseThrow(() ->
+								new UsernameNotFoundException("User not found"));
+
+		if (mapping.getUsers().getUsername().equals(username)) {
 			return true;
 		}
 		return false;

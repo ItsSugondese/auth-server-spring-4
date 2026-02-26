@@ -2,6 +2,7 @@ package com.lazy.authserver.utils.mail;
 
 import com.lazy.authserver.config.CustomMessageSource;
 import com.lazy.authserver.enums.PasswordSetType;
+import com.lazy.authserver.exception.AppException;
 import com.lazy.authserver.pojo.user.resetPassword.ResetPasswordDetailRequestPojo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,14 +45,15 @@ public class EmailServiceHelper {
 
 
     public void sendResetPasswordEmail(ResetPasswordDetailRequestPojo requestPojo) {
-//        String baseUrl = (requestPojo.getBaseUrl() == null ? (requestPojo.getUserType() == UserType.MEMBER ? MEMBER_FRONTEND_URI :  ADMIN_FRONTEND_URI ):
-//                requestPojo.getBaseUrl()) + "/reset-password/";
+        if(requestPojo.getBaseUrl() == null){
+            throw new AppException("Origin not found");
+        }
+        String baseUrl = requestPojo.getBaseUrl() + "/auth/reset-password/";
 
-        String baseUrl = "/reset-password";
         String link = baseUrl + requestPojo.getResetToken();
 
         Map<String, Object> model = new HashMap<>();
-        model.put("fullName", requestPojo.getFullName());
+        model.put("fullName", "Valued Customer");
         model.put("passwordResetLink", link);
         model.put("expireTime", requestPojo.getPasswordSetType().equals(PasswordSetType.SET) ? "24 hours" : "10 minutes");
         mailSenderService.sendEmailWithTemplate(EmailSenderRequest.builder().toEmail(Collections.singletonList(requestPojo.getUserEmail())).subject("Password Reset").templateName("password-reset-mail.ftl").model(model).build());
@@ -59,7 +61,7 @@ public class EmailServiceHelper {
 
     public void sendResetPasswordSuccessEmail(ResetPasswordDetailRequestPojo requestPojo) {
         Map<String, Object> model = new HashMap<>();
-        model.put("fullName", requestPojo.getFullName());
+        model.put("fullName", "user");
         mailSenderService.sendEmailWithTemplate(EmailSenderRequest.builder().toEmail(Collections.singletonList(requestPojo.getUserEmail())).subject("Password Reset").templateName("password-reset-success-mail.ftl").model(model).build());
     }
 

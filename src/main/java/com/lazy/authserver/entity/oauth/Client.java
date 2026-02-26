@@ -1,21 +1,18 @@
 package com.lazy.authserver.entity.oauth;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.lazy.authserver.generic.api.AuditActiveAbstract;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "client")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Client {
+@Getter
+@Setter
+public class Client extends AuditActiveAbstract {
 
 	@Id
 	private String id;
@@ -36,4 +33,8 @@ public class Client {
 	private String clientSettings;
 	@Column(length = 2000)
 	private String tokenSettings;
+
+	public String getIdString(){
+		return String.valueOf(id);
+	}
 }
