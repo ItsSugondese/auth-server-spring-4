@@ -32,8 +32,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.*;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.*;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -45,6 +48,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -58,45 +62,6 @@ public class SecurityConfig {
     @Value("${FRONTEND_URL}")
     private String frontEndUrl;
 
-
-//    @Bean
-//    @Order(1)
-//    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, UserDetailsService userDetailsService,
-//                                                                      OAuth2AuthorizationService authorizationService,
-//                                                                      OAuth2TokenGenerator<?> tokenGenerator) throws Exception {
-//        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-//        authorizationServerConfigurer.oidc(oidc -> oidc.clientRegistrationEndpoint(Customizer.withDefaults()));
-//
-//
-//        http
-//                .securityMatcher("/oauth2/**", "/.well-known/openid-configuration", "/connect/register", "/oauth2/client")
-//                .with(authorizationServerConfigurer, (authorizationServer) ->
-//                        authorizationServer
-//                                .tokenEndpoint(tokenEndpoint ->
-//                                        tokenEndpoint
-//                                                .accessTokenRequestConverter(
-//                                                        new OAuth2PasswordGrantAuthenticationConverter())
-//                                                .authenticationProvider(
-//                                                        new OAuth2PasswordGrantAuthenticationProvider(userDetailsService, passwordEncoder(), authorizationService, tokenGenerator)))
-//                )
-//                .cors(Customizer.withDefaults())
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/user", "/user/**").permitAll()
-//                )
-//                .exceptionHandling(exceptions -> exceptions
-//                .defaultAuthenticationEntryPointFor(
-//                        new LoginUrlAuthenticationEntryPoint("/login"),
-//                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-//                )
-//        );
-//
-//        http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
-//
-//        return http.build();
-//    }
-
-
     @Bean
     @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(
@@ -107,6 +72,7 @@ public class SecurityConfig {
 
         OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
                 new OAuth2AuthorizationServerConfigurer();
+
 
         http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
@@ -121,10 +87,10 @@ public class SecurityConfig {
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize ->
-                        authorize
-                                .anyRequest().authenticated()
-                )
+//                .authorizeHttpRequests(authorize ->
+//                        authorize
+//                                .anyRequest().authenticated()
+//                )
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -136,22 +102,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-//    @Bean
-//    @Order(2)
-//    SecurityFilterChain loginFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .securityMatcher("/**") // handles all non-OAuth2 endpoints
-//                .cors(Customizer.withDefaults())
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/user", "/user/**").permitAll() // public endpoints
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(Customizer.withDefaults());
-//
-//        return http.build();
-//    }
-
     @Bean
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http)
@@ -159,6 +109,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/actuator/health").permitAll() // Allow access to /actuator/health without authentication
+                        .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/**").authenticated() // API endpoints require authentication
                         .anyRequest().authenticated()
                 )
@@ -196,7 +147,9 @@ public class SecurityConfig {
 
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        return AuthorizationServerSettings.builder()
+                .issuer("http://localhost:8080/auth")
+                .build();
     }
 
     @Bean
@@ -256,28 +209,5 @@ public class SecurityConfig {
         }
         return keyPair;
     }
-
-
-//    @Bean
-//    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
-//                                                       PasswordEncoder passwordEncoder) {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-//        provider.setPasswordEncoder(passwordEncoder);
-//        return new ProviderManager(provider);
-//    }
-
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        ClassLoader classLoader = getClass().getClassLoader();
-//        return JsonMapper.builder()
-//                .addModules(SecurityJacksonModules.getModules(classLoader))
-//                .addModules(new OAuth2AuthorizationServerJacksonModule())
-//                .activateDefaultTyping(
-//                        LaissezFaireSubTypeValidator.instance,
-//                        ObjectMapper.DefaultTyping.NON_FINAL
-//                )
-//                .build();
-//    }
-
 
 }

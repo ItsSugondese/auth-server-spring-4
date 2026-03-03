@@ -47,7 +47,7 @@ public class ClientSeeder implements CommandLineRunner {
                 .scope(OidcScopes.OPENID)
                 .scope("profile")
                 .clientSettings(ClientSettings.builder()
-                        .requireProofKey(true) // enforces PKCE
+                        .requireProofKey(false) // enforces PKCE
                         .build())
                 .build();
 
