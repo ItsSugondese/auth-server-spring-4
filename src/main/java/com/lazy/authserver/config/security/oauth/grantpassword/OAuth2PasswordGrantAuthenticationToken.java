@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationGrantAuthenticationToken;
 
 import java.io.Serial;
+import java.util.Map;
 import java.util.Set;
 
 import static com.lazy.authserver.config.security.oauth.grantpassword.OAuth2PasswordGrantAuthenticationConverter.PASSWORD_GRANT_TYPE;
@@ -20,14 +21,16 @@ public class OAuth2PasswordGrantAuthenticationToken extends OAuth2AuthorizationG
     private final String password;
     private final String clientId;
     private final Set<String> scopes;
+    private final Map<String, Object> additionalParameters;
 
 
-    public OAuth2PasswordGrantAuthenticationToken(String username, String password, Authentication clientPrincipal, Set<String> scopes) {
-        super(PASSWORD_GRANT_TYPE, clientPrincipal, null);
+    public OAuth2PasswordGrantAuthenticationToken(String username, String password, Authentication clientPrincipal, Set<String> scopes, Map<String, Object> additionalParameters) {
+        super(PASSWORD_GRANT_TYPE, clientPrincipal, additionalParameters);
         this.password = password;
         this.username = username;
         this.clientId = clientPrincipal.getName();
         this.scopes = scopes;
+        this.additionalParameters = additionalParameters;
     }
 
     public String getUsername() {
@@ -44,5 +47,10 @@ public class OAuth2PasswordGrantAuthenticationToken extends OAuth2AuthorizationG
 
     public Set<String> getScopes() {
         return scopes;
+    }
+
+    @Override
+    public Map<String, Object> getAdditionalParameters() {
+        return additionalParameters;
     }
 }

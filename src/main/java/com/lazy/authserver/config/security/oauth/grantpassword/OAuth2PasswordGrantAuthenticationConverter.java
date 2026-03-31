@@ -41,8 +41,23 @@ public class OAuth2PasswordGrantAuthenticationConverter implements Authenticatio
 
         Set<String> scopes = scope != null ? Set.of(scope.split(" ")) : null;
 
+// 🔥 Extract custom params
+        Map<String, Object> additionalParameters = new java.util.HashMap<>();
+
+        parameters.forEach((key, values) -> {
+            if (!Set.of(
+                    OAuth2ParameterNames.GRANT_TYPE,
+                    OAuth2ParameterNames.CLIENT_ID,
+                    OAuth2ParameterNames.SCOPE,
+                    "username",
+                    "password"
+            ).contains(key)) {
+                additionalParameters.put(key, values.get(0));
+            }
+        });
+
         return new OAuth2PasswordGrantAuthenticationToken(parameters.getFirst("username"),
-                parameters.getFirst("password"), clientPrincipal, scopes);
+                parameters.getFirst("password"), clientPrincipal, scopes, additionalParameters);
     }
 
     // from https://docs.spring.io/spring-authorization-server/docs/current/reference/html/guides/how-to-ext-grant-type.html

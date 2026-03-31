@@ -48,10 +48,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -175,6 +172,16 @@ public class SecurityConfig {
                         .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
                 context.getClaims().claim("authorities", authorities)
                         .claim("user", principal.getName());
+
+
+                if(principal.getDetails() != null) {
+                    Map<String, Object> additional =
+                            (Map<String, Object>) principal.getDetails();
+
+                    for(Map.Entry<String, Object> entry : additional.entrySet()){
+                        context.getClaims().claim(entry.getKey(), entry.getValue());
+                    }
+                }
             }
         };
     }

@@ -83,6 +83,9 @@ public class OAuth2PasswordGrantAuthenticationProvider implements Authentication
             authorizedScopes = new LinkedHashSet<>(passwordGrantAuthenticationToken.getScopes());
         }
 
+        Map<String, Object> additionalParameters =
+                passwordGrantAuthenticationToken.getAdditionalParameters();
+
         if (log.isDebugEnabled()) {
             log.debug("Checking user credentials");
         }
@@ -95,6 +98,7 @@ public class OAuth2PasswordGrantAuthenticationProvider implements Authentication
         }
 
         var userPrincipal = new UsernamePasswordAuthenticationToken(userDetails, providedPassword, userDetails.getAuthorities());
+        userPrincipal.setDetails(additionalParameters);
 
         if (log.isDebugEnabled()) {
             log.debug("Generating access token");
@@ -111,6 +115,7 @@ public class OAuth2PasswordGrantAuthenticationProvider implements Authentication
                 .authorizationGrantType(PASSWORD_GRANT_TYPE)
                 .authorizationGrant(passwordGrantAuthenticationToken)
                 .put("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()))
+                .put("additionalParameters", additionalParameters)
                 .build();
 
         OAuth2Token generatedAccessToken = this.tokenGenerator.generate(tokenContext);
