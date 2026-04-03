@@ -36,7 +36,8 @@ public class JpaUserDetailsManager implements UserDetailsManager {
 
 		Collection<GrantedAuthority> authorities = new HashSet<>();
 		mapping.getAuthorities().forEach(auth -> authorities.add(new SimpleGrantedAuthority(auth.getAuthority())));
-		return new User(
+		return new CustomUserDetails(
+				mapping.getId(),
 				username,
 				mapping.getPassword(),
 				mapping.isActive(),

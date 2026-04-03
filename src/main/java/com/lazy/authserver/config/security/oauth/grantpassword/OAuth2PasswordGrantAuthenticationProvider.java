@@ -1,5 +1,6 @@
 package com.lazy.authserver.config.security.oauth.grantpassword;
 
+import com.lazy.authserver.config.security.oauth.CustomUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -92,12 +93,13 @@ public class OAuth2PasswordGrantAuthenticationProvider implements Authentication
         //verifie si l'utilisateur existe et ses credentials sont valides
         String providedUsername = passwordGrantAuthenticationToken.getUsername();
         String providedPassword = passwordGrantAuthenticationToken.getPassword();
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(providedUsername);
+        CustomUserDetails userDetails = (CustomUserDetails) this.userDetailsService.loadUserByUsername(providedUsername);
         if (!this.passwordEncoder.matches(providedPassword, userDetails.getPassword())) {
             throw new OAuth2AuthenticationException("Invalid resource owner credentials");
         }
 
         var userPrincipal = new UsernamePasswordAuthenticationToken(userDetails, providedPassword, userDetails.getAuthorities());
+        additionalParameters.put("userId", userDetails.getUserId());
         userPrincipal.setDetails(additionalParameters);
 
         if (log.isDebugEnabled()) {
